@@ -6,13 +6,13 @@ namespace TableHunt;
 /// <summary>
 /// For performing queries
 ///
-/// Will move ths out of code eventially.
+/// Will move ths out of code eventually.
 /// </summary>
 public static class Data
 {
     public static List<DataQuery> Queries = new List<DataQuery>()
     {
-        new DataQuery()
+        new()
         {
             Name="Effectiveness",
             Index="Date_value",
@@ -78,8 +78,6 @@ DeliveryByThreat
 | sort by Date_value asc
 | project Date_value, Clean, Malware, Phish, Spam, Bulk, MessagesGotReported, PostDeliveryZAP, PreAllow, PreNotSpam, PreSpam, PreBlock, PrePhish, PreMalware, PostAllow, PostNotSpam, PostSpam, PostBulk, PostBlock, PostPhish, PostMalware
 | where isnotempty(Date_value)",
-            
         }
-        
     };
 }

@@ -38,20 +38,26 @@ public class BatchTable : IAsyncDisposable
     private TableClient _tableClient { get; set; }
     
     /// <summary>
+    /// Partition
+    /// </summary>
+    private string _Partition { get; set; }
+    
+    /// <summary>
     /// Batch Table
     /// </summary>
-    public BatchTable(string ConnectionString, string TableName, ILogger logger)
+    public BatchTable(string ConnectionString, string TableName, string Partition, ILogger logger)
     {
         
         // Establish service client
         var serviceClient = new TableServiceClient(ConnectionString);
         
         // Create required table
-        serviceClient.CreateTableIfNotExists("TableName");
+        serviceClient.CreateTableIfNotExists(TableName);
         
         // Set vars
         _log = logger;
-
+        _Partition = Partition;
+        
         _tableClient = new TableClient(ConnectionString, TableName);
     }
     
