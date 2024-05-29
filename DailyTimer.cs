@@ -15,18 +15,9 @@ namespace TableHunt;
 public static class DailyTimer
 {
     
-    private static string _appClientId = Environment.GetEnvironmentVariable("AppClientId", EnvironmentVariableTarget.Process);
-    private static string _appTenantId = Environment.GetEnvironmentVariable("AppTenantId", EnvironmentVariableTarget.Process);
-    private static string _appSecret = Environment.GetEnvironmentVariable("AppSecret", EnvironmentVariableTarget.Process);
-    
     [FunctionName("DailyTimer")]
     public static async Task RunAsync([TimerTrigger("0 3 * * *")] TimerInfo myTimer, ILogger log)
     {
-
-        if (string.IsNullOrEmpty(_appClientId) || string.IsNullOrEmpty(_appTenantId) ||
-            string.IsNullOrEmpty(_appSecret))
-            throw new Exception("AppClientId, AppTenantId, and AppSecret environment variables must be set");
-        
         await RunQueries(log);
     }
 
@@ -69,7 +60,7 @@ public static class DailyTimer
         log.LogInformation($"Running query {query.Name}");
             
         // Generate a batch table uploader for this query
-        BatchTable batchTable = new BatchTable(GetStorageConnection(), query.Name, _appTenantId, log);
+        BatchTable batchTable = new BatchTable(GetStorageConnection(), query.Name, log);
             
         // Run query and get results
         var requestBody = new RunHuntingQueryPostRequestBody
@@ -148,18 +139,14 @@ public static class DailyTimer
     /// <returns></returns>
     private static GraphServiceClient GetGraphServicesClient()
     {
-        // Construct auth provider to Graph
+        // Use default azure credential
+        var tokenCredential = new DefaultAzureCredential();
+        
+        // Default graph scope
         var scopes = new[] { "https://graph.microsoft.com/.default" };
-        var tenantId = "common";
-        
-        var options = new TokenCredentialOptions
-        {
-            AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-        };
 
-        var clientSecretCredential = new ClientSecretCredential(_appTenantId, _appClientId, _appSecret, options);
-        
-        return new GraphServiceClient(clientSecretCredential, scopes);
+        // Return graph services client
+        return new GraphServiceClient(tokenCredential, scopes);
     }
     
     /// <summary>
